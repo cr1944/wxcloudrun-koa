@@ -10,6 +10,24 @@ const router = new Router();
 
 const homePage = fs.readFileSync(path.join(__dirname, "index.html"), "utf-8");
 
+const MpUploadOssHelper = require("./oss/uploadOssHelper.js");
+
+router.get("/getPostObjectParams", async (ctx) => {
+  const mpHelper = new MpUploadOssHelper({
+    // 阿里云账号AccessKey拥有所有API的访问权限，风险很高。强烈建议您创建并使用RAM用户进行API访问或日常运维，请登录RAM控制台创建RAM用户。
+    accessKeyId: process.env.oss_accessKeyId,
+    accessKeySecret: process.env.oss_accessKeySecret,
+    // 限制参数的生效时间，单位为小时，默认值为1。
+    timeout: 1,
+    // 限制上传文件大小，单位为MB，默认值为10。
+    maxSize: 50,
+  });
+
+  // 生成参数。
+  const params = mpHelper.createUploadParams();
+  ctx.body = params
+});
+
 // 首页
 router.get("/", async (ctx) => {
   ctx.body = homePage;
