@@ -103,7 +103,7 @@ async function getUser(openid) {
 
 // 新增用户
 async function addUser(openid) {
-  await User.create({openid: openid, count: 10 });
+  await User.create();
 }
 
 const app = new Koa();
