@@ -65,7 +65,7 @@ router.get("/api/count", async (ctx) => {
 router.get("/api/login", async (ctx) => {
   if (ctx.request.headers["x-wx-source"]) {
     const openid = ctx.request.headers["x-wx-openid"];
-	let user = getUser(openid);
+	let user = await getUser(openid);
 	if (user) {
 		ctx.body = {
 		  code: 0,
