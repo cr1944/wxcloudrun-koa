@@ -4,7 +4,7 @@ const logger = require("koa-logger");
 const bodyParser = require("koa-bodyparser");
 const fs = require("fs");
 const path = require("path");
-const { init: initDB, Counter } = require("./db");
+const { init: initDB, Counter, User } = require("./db");
 
 const router = new Router();
 
@@ -62,11 +62,49 @@ router.get("/api/count", async (ctx) => {
 });
 
 // 小程序调用，获取微信 Open ID
-router.get("/api/wx_openid", async (ctx) => {
+router.get("/api/login", async (ctx) => {
   if (ctx.request.headers["x-wx-source"]) {
-    ctx.body = ctx.request.headers["x-wx-openid"];
+    const openid = ctx.request.headers["x-wx-openid"];
+	let user = getUser(openid);
+	if (user) {
+		ctx.body = {
+		  code: 0,
+		  message: 'succ',
+		  user: user,
+		}
+	} else {
+		ctx.body = {
+		  code: -1,
+		  message: 'user not found'
+		}
+	}
+  } else {
+	ctx.body = {
+      code: -1,
+      message: 'unknown source',
+	}
   }
 });
+
+// 获取用户信息
+async function getUser(openid) {
+	if (!openid) {
+		return null
+	}
+	let user = null;
+	user = await User.findOne({ where: { openid } });
+	// 用户不存在，新增用户
+	if (!user) {
+		await addUser(openid);
+		user = await User.findOne({ where: { openid } });
+	}
+	return user;
+}
+
+// 新增用户
+async function addUser(openid) {
+  await User.create({ openid, createTime: new Date().toLocaleString(), count: 10 });
+}
 
 const app = new Koa();
 app
