@@ -21,17 +21,8 @@ const Counter = sequelize.define("Counter", {
 });
 
 const User = sequelize.define("User", {
-	id: {
-	  type: Sequelize.INTEGER, // 要与数据库声明的类型匹配
-	  autoIncrementIdentity: true, // 自增
-	  primaryKey: true, // 主键
-	},
 	openid: {
       type: Sequelize.STRING,
-      allowNull: true,
-    },
-    createTime: {
-      type: Sequelize.DATE,
       allowNull: true,
     },
 	count: {
